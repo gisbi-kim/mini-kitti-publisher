@@ -34,3 +34,13 @@ We note that the directory should form like
         |-- 01
         |-- ...
 ```
+
+### Tip 
+If you use my pre-tuned-visualization config file, it is easy to show how the data flow.
+For example,
+```
+$ rviz -d rviz_setting.rviz
+
+and other terminal 
+$ rqt --perspective-file rqt_setting.perspective
+```
