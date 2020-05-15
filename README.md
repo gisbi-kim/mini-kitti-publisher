@@ -3,12 +3,34 @@ A very simple KITTI odometry dataset's images and velodyne points publisher
 
 ### How to use
 ```
-$ mkdir -p ~/Documents/catkin_minikittipub/src
-$ cd ~/Documents/catkin_minikittipub/src
-$ git clone https://github.com/kissb2/mini-kitti-publisher.git
-$ cd ..
-$ catkin_make
-$ source devel/setup.bash
-$ source devel/setup.bash
+$ python mini_kitti_publisher.py --dir "...your kitti dataset base directory../sequences/XX"
+```
 
+We note that the directory should form like 
+```
+| your kitti dataset base dir 
+    |-- sequences 
+        |-- 00
+            |-- image_0
+                |-- 000000.png
+                |-- 000001.png
+                |-- ...
+            |-- image_1
+                |-- 000000.png
+                |-- 000001.png
+                |-- ...
+            |-- image_2
+                |-- 000000.png
+                |-- 000001.png
+                |-- ...
+            |-- image_3
+                |-- 000000.png
+                |-- 000001.png
+                |-- ...
+            |-- velodyne
+                |-- 000000.bin
+                |-- 000001.bin
+                |-- ...
+        |-- 01
+        |-- ...
 ```
