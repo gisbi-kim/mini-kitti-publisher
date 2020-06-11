@@ -35,6 +35,9 @@ We note that the directory should form like
         |-- ...
 ```
 
+### Termination of the program
+- Use ```ctrl + \``` at the terminal.  
+
 ### Tip 
 If you use my pre-tuned-visualization config file, it is easy to show how the data flow.
 For example,
