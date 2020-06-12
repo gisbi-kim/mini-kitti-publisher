@@ -10,17 +10,18 @@ import std_msgs.msg as std_msgs
 import geometry_msgs.msg
 
 import argparse
+import csv
 
 import cv2
 from cv_bridge import CvBridge
 import numpy as np
 
 parser = argparse.ArgumentParser(description='A simple kitti publisher')
-parser.add_argument('--dir', default='/media/user/GS1TB/KITTI/dataset/sequences/00/', metavar='DIR', help='path to dataset')
+parser.add_argument('--dir', default='/home/user/Documents/data/KITTI/00', metavar='DIR', help='path to dataset')
 args = parser.parse_args()
 
 
-def makePointCloud2Msg(points, parent_frame, pcd_format):
+def makePointCloud2Msg(points, frame_time, parent_frame, pcd_format):
 
     ros_dtype = sensor_msgs.PointField.FLOAT32
 
@@ -33,7 +34,9 @@ def makePointCloud2Msg(points, parent_frame, pcd_format):
         name=n, offset=i*itemsize, datatype=ros_dtype, count=1)
         for i, n in enumerate(pcd_format)]
 
-    header = std_msgs.Header(frame_id=parent_frame, stamp=rospy.Time.now())
+    # header = std_msgs.Header(frame_id=parent_frame, stamp=rospy.Time.now())
+    header = std_msgs.Header(frame_id=parent_frame, stamp=rospy.Time.from_sec(frame_time))
+    
     num_field = 3
     return sensor_msgs.PointCloud2(
         header=header,
@@ -54,7 +57,7 @@ if __name__ == '__main__':
     r = rospy.Rate(10)
 
     bridge = CvBridge()
- 
+
     # 
     grayleftimg_publisher = rospy.Publisher("image_0", sensor_msgs.Image, queue_size=10)
     grayrightimg_publisher = rospy.Publisher("image_1", sensor_msgs.Image, queue_size=10)
@@ -74,12 +77,19 @@ if __name__ == '__main__':
     scan_names = os.listdir(scan_dir)
     scan_names.sort()
     
+    # parse gt times 
+    times = []
+    with open(os.path.join(seqence_dir, 'times.txt')) as csvfile:
+        times_reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+        for line in times_reader:
+            times.append(float(line[0]))
+    
     #
     num_frames = scan_names.__len__()
     for frame_idx in range(num_frames):
         frame_num_str = scan_names[frame_idx][:-4]
         img_name = frame_num_str + '.png'
-        
+
         # pub images
         grayleftimg_path = os.path.join(grayleftimg_dir, img_name)
         grayleftimg_publisher.publish( bridge.cv2_to_imgmsg(cv2.imread(grayleftimg_path), 'bgr8') )
@@ -96,7 +106,7 @@ if __name__ == '__main__':
         # pub velodyne scan 
         scan_path = os.path.join(scan_dir, scan_names[frame_idx])
         xyzi = np.fromfile(scan_path, dtype=np.float32).reshape((-1, 4))
-        scan_publisher.publish(makePointCloud2Msg(xyzi[:, :3], "KITTI", 'xyz'))
+        scan_publisher.publish(makePointCloud2Msg(xyzi[:, :3], times[frame_idx], "KITTI", 'xyz'))
 
         #
         r.sleep()
