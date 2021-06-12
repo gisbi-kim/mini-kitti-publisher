@@ -37,7 +37,7 @@ def makePointCloud2Msg(points, frame_time, parent_frame, pcd_format):
     # header = std_msgs.Header(frame_id=parent_frame, stamp=rospy.Time.now())
     header = std_msgs.Header(frame_id=parent_frame, stamp=rospy.Time.from_sec(frame_time))
     
-    num_field = 3
+    num_field = len(pcd_format)
     return sensor_msgs.PointCloud2(
         header=header,
         height=1,
@@ -106,7 +106,7 @@ if __name__ == '__main__':
         # pub velodyne scan 
         scan_path = os.path.join(scan_dir, scan_names[frame_idx])
         xyzi = np.fromfile(scan_path, dtype=np.float32).reshape((-1, 4))
-        scan_publisher.publish(makePointCloud2Msg(xyzi[:, :3], times[frame_idx], "KITTI", 'xyz'))
+        scan_publisher.publish(makePointCloud2Msg(xyzi, times[frame_idx], "KITTI", ['x', 'y', 'z', 'intensity']))
 
         #
         r.sleep()
